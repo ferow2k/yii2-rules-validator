@@ -3,11 +3,12 @@
 namespace vjik\rulesValidator;
 
 use Closure;
-use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
-use yii\validators\InlineValidator;
 use yii\validators\Validator;
+use yii\validators\InlineValidator;
+use yii\validators\ValidationAsset;
+use yii\base\InvalidConfigException;
 
 class RulesValidator extends Validator
 {
@@ -16,11 +17,6 @@ class RulesValidator extends Validator
      * @inheritDoc
      */
     public $skipOnEmpty = false;
-
-    /**
-     * @inheritDoc
-     */
-    public $enableClientValidation = false;
 
     /**
      * @inheritDoc
@@ -169,5 +165,14 @@ class RulesValidator extends Validator
         }
 
         return Validator::createValidator($type, $model, $this->attributes, $params);
+    }
+
+    public function clientValidateAttribute($model, $attribute, $view)
+    {
+        $js = '';
+        foreach ($this->getValidators(new Model()) as $validator) {
+            $js .= $validator->clientValidateAttribute($model, $attribute, $view);
+        }
+        return $js;
     }
 }
